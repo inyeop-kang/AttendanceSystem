@@ -1,0 +1,22 @@
+<Window x:Class="AttendanceClient.Views.KioskWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:AttendanceClient.Views"
+        Title="출석 키오스크" Height="794" Width="1123"
+        WindowStartupLocation="CenterScreen">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Background="#2C3E50" LastChildFill="False" Height="44">
+            <TextBlock Text="AI 출결관리 - 출석 키오스크" Foreground="White" FontSize="16" FontWeight="Bold"
+                       VerticalAlignment="Center" Margin="16,0,0,0" DockPanel.Dock="Left"/>
+            <Button Content="관리자 모드로 전환" Width="150" Height="30" Margin="0,0,16,0"
+                    DockPanel.Dock="Right" Click="AdminModeButton_Click"/>
+        </DockPanel>
+
+        <local:AttendanceCheckView Grid.Row="1" Margin="16"/>
+    </Grid>
+</Window>

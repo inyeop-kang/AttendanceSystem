@@ -1,0 +1,42 @@
+<UserControl x:Class="AttendanceClient.Views.StudentsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="StudentsView_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Text="교육생 관리" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,24,0"/>
+            <TextBox x:Name="SearchBox" Width="200" Height="30" VerticalContentAlignment="Center"/>
+            <Button Content="검색" Width="70" Height="30" Margin="8,0,0,0" Click="SearchButton_Click"/>
+            <Button Content="신규 등록" Width="90" Height="30" Margin="24,0,0,0" Click="AddButton_Click"/>
+            <Button Content="새로고침" Width="90" Height="30" Margin="8,0,0,0" Click="RefreshButton_Click"/>
+        </StackPanel>
+
+        <DataGrid x:Name="StudentsGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="교육생 번호" Binding="{Binding StudentNo}" Width="120"/>
+                <DataGridTextColumn Header="이름" Binding="{Binding Name}" Width="100"/>
+                <DataGridTextColumn Header="과정명" Binding="{Binding Department}" Width="160"/>
+                <DataGridTextColumn Header="기수" Binding="{Binding Grade}" Width="60"/>
+                <DataGridTextColumn Header="얼굴등록여부" Binding="{Binding HasFaceRegistered}" Width="100"/>
+                <DataGridTemplateColumn Header="작업" Width="260">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="얼굴등록" Width="70" Margin="2" Click="FaceRegisterButton_Click" Tag="{Binding}"/>
+                                <Button Content="수정" Width="50" Margin="2" Click="EditButton_Click" Tag="{Binding}"/>
+                                <Button Content="삭제" Width="50" Margin="2" Click="DeleteButton_Click" Tag="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

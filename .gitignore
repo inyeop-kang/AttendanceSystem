@@ -1,0 +1,163 @@
+# ========================================
+# C# / .NET / WPF / Visual Studio
+# ========================================
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# Visual Studio cache
+*.VC.db
+*.VC.VC.opendb
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Code coverage
+*.coverage
+*.coveragexml
+
+# ASP.NET generated files
+wwwroot/lib/
+
+# Publish output
+publish/
+
+# ========================================
+# Python
+# ========================================
+
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*.pyo
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg
+*.egg-info/
+
+# Python packaging
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Type checkers / linters
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ========================================
+# IDE
+# ========================================
+
+# Visual Studio Code
+.vscode/
+
+# JetBrains Rider / PyCharm
+.idea/
+
+# ========================================
+# Environment / Secrets
+# ========================================
+
+.env
+.env.*
+!.env.example
+
+# ========================================
+# Logs
+# ========================================
+
+*.log
+logs/
+
+# ========================================
+# OS generated files
+# ========================================
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# ========================================
+# Temporary files
+# ========================================
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# ========================================
+# Python local data / cache
+# ========================================
+
+.pytest_cache/
+.mypy_cache/
+
+# ========================================
+# Local database
+# ========================================
+
+*.db
+*.sqlite
+*.sqlite3
