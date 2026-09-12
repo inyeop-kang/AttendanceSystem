@@ -25,7 +25,6 @@ mysql -u root -p < db/schema.sql
 ```
 
 - `attendance_system` 데이터베이스와 `students`, `face_embeddings`, `attendance`, `admins` 테이블이 생성됩니다.
-- 앱 전용 계정 `attendance_app` (비밀번호 `AppUser!2026`) 이 함께 생성됩니다.
 - 기본 관리자 계정(`admin` / `admin1234`)은 C# 서버를 처음 실행할 때 자동으로 생성됩니다.
 
 ## 2. AI 서버 실행 (Python)
