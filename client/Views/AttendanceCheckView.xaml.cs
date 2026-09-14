@@ -196,14 +196,9 @@ namespace AttendanceClient.Views
                 ResultStatusText.Text = "퇴실";
                 ResultStatusText.Foreground = Brushes.SteelBlue;
             }
-            else if (response.Status == "late")
-            {
-                ResultStatusText.Text = "지각";
-                ResultStatusText.Foreground = Brushes.DarkOrange;
-            }
             else
             {
-                ResultStatusText.Text = "출석";
+                ResultStatusText.Text = "입실";
                 ResultStatusText.Foreground = Brushes.Green;
             }
 

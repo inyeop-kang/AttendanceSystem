@@ -6,7 +6,7 @@
         </Grid.RowDefinitions>
         <DockPanel LastChildFill="False">
             <TextBlock Text="얼굴 인식 출석" Style="{StaticResource Heading}" DockPanel.Dock="Left"/>
-            <Button Content="관리자 모드" Click="AdminModeButton_Click" Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right" Width="112" VerticalAlignment="Top"/>
+            <Button Content="관리화면으로 변경" Click="AdminModeButton_Click" Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right" Width="150" VerticalAlignment="Top"/>
         </DockPanel>
         <local:AttendanceCheckView Grid.Row="1"/>
     </Grid>

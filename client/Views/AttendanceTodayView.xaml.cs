@@ -56,8 +56,8 @@ namespace AttendanceClient.Views
                 return;
             }
 
-            PresentCountText.Text = summary.PresentCount.ToString();
-            LateCountText.Text = summary.LateCount.ToString();
+            CheckedInCountText.Text = summary.CheckedInCount.ToString();
+            CheckedOutCountText.Text = summary.CheckedOutCount.ToString();
             AbsentCountText.Text = summary.AbsentCount.ToString();
             TotalCountText.Text = summary.TotalCount.ToString();
             AttendanceGrid.ItemsSource = summary.Items;

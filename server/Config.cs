@@ -15,8 +15,6 @@ namespace AttendanceServer
         public static string AiServerHost = GetStringEnv("ATTENDANCE_AI_HOST", "127.0.0.1");
         public static int AiServerPort = GetIntEnv("ATTENDANCE_AI_PORT", 8001);
 
-        public static TimeSpan LateCutoffTime = new TimeSpan(9, 0, 0);
-
         private static string GetStringEnv(string name, string defaultValue)
         {
             string value = Environment.GetEnvironmentVariable(name);

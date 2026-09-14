@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AttendanceServer.Data;
@@ -38,8 +37,6 @@ namespace AttendanceServer
         public async Task<string> Handle(string requestJson)
         {
             object response;
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            string timedAction = "unknown";
 
             try
             {
@@ -47,7 +44,6 @@ namespace AttendanceServer
                 {
                     JsonElement root = doc.RootElement;
                     string action = GetString(root, "action");
-                    timedAction = action;
 
                     if (action == "login")
                     {
@@ -100,10 +96,7 @@ namespace AttendanceServer
                 response = errorResult;
             }
 
-            string responseJson = JsonSerializer.Serialize(response);
-            stopwatch.Stop();
-            Console.WriteLine("[timing] action=" + timedAction + " " + stopwatch.ElapsedMilliseconds + "ms");
-            return responseJson;
+            return JsonSerializer.Serialize(response);
         }
 
         // ------------------------------------------------------------
@@ -182,10 +175,7 @@ namespace AttendanceServer
                 return response;
             }
 
-            Stopwatch bcryptWatch = Stopwatch.StartNew();
             bool valid = BCrypt.Net.BCrypt.Verify(password, passwordHash);
-            bcryptWatch.Stop();
-            Console.WriteLine("[timing]   bcrypt.Verify " + bcryptWatch.ElapsedMilliseconds + "ms");
 
             if (!valid)
             {
@@ -384,33 +374,18 @@ namespace AttendanceServer
 
             if (existing != null)
             {
-                response.Status = existing.Status;
+                response.Status = existing.CheckOutTime == DateTime.MinValue ? "checked_in" : "checked_out";
                 response.CheckInTime = existing.CheckInTime;
                 response.CheckOutTime = existing.CheckOutTime;
                 response.Message = student.Name + "님은 오늘 이미 입실 처리되었습니다.";
                 return response;
             }
 
-            string status = "present";
+            attendanceRepository.CreateCheckIn(student.Id, now, "present", response.Confidence);
 
-            if (now.TimeOfDay > Config.LateCutoffTime)
-            {
-                status = "late";
-            }
-
-            attendanceRepository.CreateCheckIn(student.Id, now, status, response.Confidence);
-
-            response.Status = status;
+            response.Status = "checked_in";
             response.CheckInTime = now;
-
-            if (status == "late")
-            {
-                response.Message = student.Name + "님, 지각 입실 처리되었습니다.";
-            }
-            else
-            {
-                response.Message = student.Name + "님, 입실 처리되었습니다.";
-            }
+            response.Message = student.Name + "님, 입실 처리되었습니다.";
 
             return response;
         }
@@ -435,11 +410,11 @@ namespace AttendanceServer
                 return response;
             }
 
-            response.Status = existing.Status;
             response.CheckInTime = existing.CheckInTime;
 
             if (existing.CheckOutTime != DateTime.MinValue)
             {
+                response.Status = "checked_out";
                 response.CheckOutTime = existing.CheckOutTime;
                 response.Message = student.Name + "님은 오늘 이미 퇴실 처리되었습니다.";
                 return response;
@@ -447,6 +422,7 @@ namespace AttendanceServer
 
             attendanceRepository.SetCheckOut(student.Id, now, now);
 
+            response.Status = "checked_out";
             response.CheckOutTime = now;
             response.Message = student.Name + "님, 퇴실 처리되었습니다.";
             return response;
@@ -475,19 +451,19 @@ namespace AttendanceServer
             TodaySummary summary = new TodaySummary();
             summary.Items = items;
             summary.TotalCount = items.Count;
-            summary.PresentCount = 0;
-            summary.LateCount = 0;
+            summary.CheckedInCount = 0;
+            summary.CheckedOutCount = 0;
             summary.AbsentCount = 0;
 
             foreach (TodayAttendanceItem item in items)
             {
-                if (item.Status == "present")
+                if (item.Status == "checked_in")
                 {
-                    summary.PresentCount = summary.PresentCount + 1;
+                    summary.CheckedInCount = summary.CheckedInCount + 1;
                 }
-                else if (item.Status == "late")
+                else if (item.Status == "checked_out")
                 {
-                    summary.LateCount = summary.LateCount + 1;
+                    summary.CheckedOutCount = summary.CheckedOutCount + 1;
                 }
                 else
                 {

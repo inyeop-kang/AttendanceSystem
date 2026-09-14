@@ -87,8 +87,10 @@ namespace AttendanceServer.Models
     public class TodaySummary
     {
         public int TotalCount { get; set; }
-        public int PresentCount { get; set; }
-        public int LateCount { get; set; }
+        // 입실했지만 아직 퇴실하지 않은 인원
+        public int CheckedInCount { get; set; }
+        // 퇴실까지 마친 인원
+        public int CheckedOutCount { get; set; }
         public int AbsentCount { get; set; }
         public List<TodayAttendanceItem> Items { get; set; }
     }

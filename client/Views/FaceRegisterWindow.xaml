@@ -18,9 +18,7 @@
             <Border Grid.Column="2" Style="{StaticResource Card}">
                 <StackPanel>
                     <TextBlock Text="얼굴 촬영 안내" FontSize="16" FontWeight="Bold" Margin="0,0,0,18"/>
-                    <TextBlock Text="1. 카메라를 정면으로 바라봐 주세요.
-2. 고개를 살짝 좌우로 움직여 주세요.
-3. 약 1~2초간 여러 장을 촬영합니다." TextWrapping="Wrap" LineHeight="23"/>
+                    <TextBlock Text="1. 카메라를 정면으로 바라봐 주세요.&#10;2. 고개를 살짝 좌우로 움직여 주세요.&#10;3. 약 1~2초간 여러 장을 촬영합니다." TextWrapping="Wrap" LineHeight="23"/>
                     <TextBlock Text="촬영 중 얼굴이 가려지지 않도록 해 주세요." Style="{StaticResource Caption}" Margin="0,18,0,0"/>
                 </StackPanel>
             </Border>
