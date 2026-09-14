@@ -1,23 +1,30 @@
-<Window x:Class="AttendanceClient.ModeSelectWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AI 출결관리 시스템 - 모드 선택"
-        Height="280" Width="420"
-        WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
-    <Grid Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="16"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="16"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <TextBlock Grid.Row="0" Text="어떤 화면으로 시작할까요?" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-
-        <Button Grid.Row="2" Content="관리자 모드" Height="60" FontSize="16" Click="AdminModeButton_Click"/>
-
-        <Button Grid.Row="4" Content="출석 모드" Height="60" FontSize="16" Click="KioskModeButton_Click"/>
-    </Grid>
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="AttendanceClient.ModeSelectWindow" Title="출결관리 시스템 - 모드 선택" Width="860" Height="480" MinWidth="860" MinHeight="480" WindowStartupLocation="CenterScreen" Style="{StaticResource AppWindow}">
+    <StackPanel Margin="64,38">
+        <TextBlock Text="어떤 작업을 시작하시겠어요?" Style="{StaticResource Heading}"/>
+        <TextBlock Text="관리자 모드 또는 출석 모드를 선택해 주세요." Style="{StaticResource Caption}" Margin="0,12,0,24"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,10,0" Padding="24">
+                <StackPanel>
+                    <TextBlock Text="01" Foreground="{StaticResource Navy}" FontWeight="Bold"/>
+                    <TextBlock Text="관리자 모드" FontSize="22" FontWeight="Bold" Margin="0,18,0,12"/>
+                    <TextBlock Text="출석 현황을 조회하고
+교육생과 얼굴 정보를 관리합니다." Foreground="{StaticResource Muted}" LineHeight="21" Margin="0,0,0,24"/>
+                    <Button Content="관리자 모드 시작" Click="AdminModeButton_Click" Style="{StaticResource PrimaryButton}"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource Card}" Margin="10,0,0,0" Padding="24">
+                <StackPanel>
+                    <TextBlock Text="02" Foreground="{StaticResource Navy}" FontWeight="Bold"/>
+                    <TextBlock Text="출석 키오스크" FontSize="22" FontWeight="Bold" Margin="0,18,0,12"/>
+                    <TextBlock Text="얼굴 인식으로
+교육생의 입실·퇴실을 기록합니다." Foreground="{StaticResource Muted}" LineHeight="21" Margin="0,0,0,24"/>
+                    <Button Content="출석 키오스크 시작" Click="KioskModeButton_Click" Style="{StaticResource PrimaryButton}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </StackPanel>
 </Window>

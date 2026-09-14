@@ -44,7 +44,7 @@ namespace AttendanceClient.Views
 
         private async void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            StudentEditWindow window = new StudentEditWindow(null);
+            StudentEditWindow window = new StudentEditWindow(null) { Owner = Window.GetWindow(this) };
             bool result = window.ShowDialog() == true;
 
             if (result)
@@ -58,7 +58,7 @@ namespace AttendanceClient.Views
             Button button = (Button)sender;
             Student student = (Student)button.Tag;
 
-            StudentEditWindow window = new StudentEditWindow(student);
+            StudentEditWindow window = new StudentEditWindow(student) { Owner = Window.GetWindow(this) };
             bool result = window.ShowDialog() == true;
 
             if (result)
@@ -98,7 +98,7 @@ namespace AttendanceClient.Views
             Button button = (Button)sender;
             Student student = (Student)button.Tag;
 
-            FaceRegisterWindow window = new FaceRegisterWindow(student);
+            FaceRegisterWindow window = new FaceRegisterWindow(student) { Owner = Window.GetWindow(this) };
             window.ShowDialog();
 
             await LoadStudents(null);
