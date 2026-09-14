@@ -70,6 +70,7 @@ namespace AttendanceClient.Views
             catch
             {
                 MessageText.Text = "저장에 실패했습니다. (교육생 번호 중복 또는 서버 오류)";
+                MessageBox.Show(MessageText.Text, "오류");
                 return;
             }
 

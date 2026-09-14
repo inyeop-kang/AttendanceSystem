@@ -24,6 +24,12 @@ def is_blurry(image):
     return variance < config.BLUR_THRESHOLD
 
 
+class SpoofDetectedError(Exception):
+    """DeepFace(FasNet)가 이 프레임을 스푸핑(사진/화면 재생 등)으로 판정했을 때 발생시킨다.
+    호출부(app.py)가 이걸 잡아서 "미등록"과 구분되는 안내 문구를 고를 수 있게 한다.
+    """
+
+
 def extract_embedding(image):
     """이미지 한 장에서 얼굴을 검출하고 임베딩을 추출한다.
     얼굴이 없거나 흐릿하거나(스푸핑 검사가 켜져 있고) 사진/화면 재생으로 의심되면
@@ -52,8 +58,8 @@ def extract_embedding(image):
         # 그래서 모든 ValueError를 콘솔에 남기고, 스푸핑 감지인지 아닌지만 구분한다.
         if "Spoof detected" in str(error):
             print("[extract_embedding] 스푸핑(사진/화면 재생 등)으로 의심되어 이 프레임 거부")
-        else:
-            print(f"[extract_embedding] DeepFace.represent() 실패(스푸핑 아님): {error}")
+            raise SpoofDetectedError(str(error)) from error
+        print(f"[extract_embedding] DeepFace.represent() 실패(스푸핑 아님): {error}")
         return None
     except Exception as error:
         print(f"[extract_embedding] 예상 못한 에러로 이 프레임 거부: {error}")
