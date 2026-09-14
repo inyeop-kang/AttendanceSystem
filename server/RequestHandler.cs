@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AttendanceServer.Data;
@@ -37,6 +38,8 @@ namespace AttendanceServer
         public async Task<string> Handle(string requestJson)
         {
             object response;
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            string timedAction = "unknown";
 
             try
             {
@@ -44,6 +47,7 @@ namespace AttendanceServer
                 {
                     JsonElement root = doc.RootElement;
                     string action = GetString(root, "action");
+                    timedAction = action;
 
                     if (action == "login")
                     {
@@ -96,7 +100,10 @@ namespace AttendanceServer
                 response = errorResult;
             }
 
-            return JsonSerializer.Serialize(response);
+            string responseJson = JsonSerializer.Serialize(response);
+            stopwatch.Stop();
+            Console.WriteLine("[timing] action=" + timedAction + " " + stopwatch.ElapsedMilliseconds + "ms");
+            return responseJson;
         }
 
         // ------------------------------------------------------------
@@ -175,7 +182,10 @@ namespace AttendanceServer
                 return response;
             }
 
+            Stopwatch bcryptWatch = Stopwatch.StartNew();
             bool valid = BCrypt.Net.BCrypt.Verify(password, passwordHash);
+            bcryptWatch.Stop();
+            Console.WriteLine("[timing]   bcrypt.Verify " + bcryptWatch.ElapsedMilliseconds + "ms");
 
             if (!valid)
             {

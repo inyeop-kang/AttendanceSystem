@@ -8,9 +8,11 @@ namespace AttendanceServer
 
         public static string DbConnectionString = GetStringEnv(
             "ATTENDANCE_DB_CONNECTION",
-            "Server=localhost;Port=3306;Database=attendance_system;User=attendance_app;Password=AppUser!2026;");
+            "Server=127.0.0.1;Port=3306;Database=attendance_system;User=attendance_app;Password=AppUser!2026;");
 
-        public static string AiServerHost = GetStringEnv("ATTENDANCE_AI_HOST", "localhost");
+        // AI 서버는 IPv4(0.0.0.0)로만 리스닝하므로 "localhost"를 쓰면 IPv6(::1) 접속이
+        // 약 2초 타임아웃된 뒤에야 IPv4로 폴백된다. 그래서 IP를 직접 지정한다.
+        public static string AiServerHost = GetStringEnv("ATTENDANCE_AI_HOST", "127.0.0.1");
         public static int AiServerPort = GetIntEnv("ATTENDANCE_AI_PORT", 8001);
 
         public static TimeSpan LateCutoffTime = new TimeSpan(9, 0, 0);

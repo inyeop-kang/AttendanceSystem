@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using MySqlConnector;
 
 namespace AttendanceServer.Data
@@ -14,8 +15,11 @@ namespace AttendanceServer.Data
 
         public MySqlConnection OpenConnection()
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
+            stopwatch.Stop();
+            Console.WriteLine("[timing]   db.OpenConnection " + stopwatch.ElapsedMilliseconds + "ms");
             return connection;
         }
 

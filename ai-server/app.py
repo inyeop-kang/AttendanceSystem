@@ -1,3 +1,5 @@
+import time
+
 import config
 import db
 import recognition
@@ -35,15 +37,23 @@ def handle_recognize(request):
     if threshold is None:
         threshold = config.MATCH_THRESHOLD
 
+    total_started = time.perf_counter()
+
+    db_started = time.perf_counter()
     known_embeddings = db.fetch_all_embeddings()
+    db_elapsed = (time.perf_counter() - db_started) * 1000
+    print("[timing] fetch_all_embeddings %.0fms (등록 임베딩 %d건)" % (db_elapsed, len(known_embeddings)))
 
     best_student_id = None
     best_similarity = 0.0
     best_second_similarity = 0.0
 
-    for image_base64 in images:
+    for frame_index, image_base64 in enumerate(images):
+        frame_started = time.perf_counter()
         image = recognition.decode_base64_image(image_base64)
         embedding = recognition.extract_embedding(image)
+        frame_elapsed = (time.perf_counter() - frame_started) * 1000
+        print("[timing]   프레임 %d/%d 검출+임베딩 %.0fms" % (frame_index + 1, len(images), frame_elapsed))
 
         if embedding is None:
             continue
@@ -54,6 +64,8 @@ def handle_recognize(request):
             best_student_id = student_id
             best_similarity = similarity
             best_second_similarity = second_similarity
+
+    print("[timing] recognize 전체 %.0fms" % ((time.perf_counter() - total_started) * 1000))
 
     if best_student_id is None or best_similarity < threshold:
         if best_student_id is None:
