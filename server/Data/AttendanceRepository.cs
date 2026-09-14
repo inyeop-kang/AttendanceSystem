@@ -116,7 +116,9 @@ namespace AttendanceServer.Data
                         item.Department = Db.GetStringOrEmpty(reader, "department");
                         item.Grade = Db.GetIntOrZero(reader, "grade");
 
-                        if (reader.IsDBNull(reader.GetOrdinal("status")))
+                        // 상태는 저장된 값이 아니라 입실·퇴실 시각의 유무로 판단한다.
+                        // (출결 기록 자체가 없으면 결석, 퇴실 시각이 있으면 퇴실, 아니면 입실)
+                        if (reader.IsDBNull(reader.GetOrdinal("attendance_date")))
                         {
                             item.Date = "";
                             item.Status = "absent";
@@ -126,9 +128,9 @@ namespace AttendanceServer.Data
                         else
                         {
                             item.Date = reader.GetDateTime("attendance_date").ToString("yyyy-MM-dd");
-                            item.Status = reader.GetString("status");
                             item.CheckInTime = GetTimeText(reader, "check_in_time");
                             item.CheckOutTime = GetTimeText(reader, "check_out_time");
+                            item.Status = item.CheckOutTime == "" ? "checked_in" : "checked_out";
                         }
 
                         list.Add(item);

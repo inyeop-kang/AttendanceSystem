@@ -4,7 +4,7 @@ import os
 SERVER_HOST = os.environ.get("ATTENDANCE_AI_HOST", "0.0.0.0")
 SERVER_PORT = int(os.environ.get("ATTENDANCE_AI_PORT", "8001"))
 
-DB_HOST = os.environ.get("ATTENDANCE_DB_HOST", "localhost")
+DB_HOST = os.environ.get("ATTENDANCE_DB_HOST", "127.0.0.1")
 DB_PORT = int(os.environ.get("ATTENDANCE_DB_PORT", "3306"))
 DB_USER = os.environ.get("ATTENDANCE_DB_USER", "attendance_app")
 DB_PASSWORD = os.environ.get("ATTENDANCE_DB_PASSWORD", "AppUser!2026")

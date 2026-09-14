@@ -43,7 +43,9 @@ CREATE TABLE IF NOT EXISTS attendance (
     attendance_date DATE NOT NULL,
     check_in_time   DATETIME NULL,
     check_out_time  DATETIME NULL,
-    status          ENUM('present','late','absent') NOT NULL DEFAULT 'present',
+    -- 화면에 표시되는 상태(입실/퇴실/결석)는 이 컬럼이 아니라
+    -- check_in_time / check_out_time 의 유무로 판단한다. (지각 개념은 사용하지 않음)
+    status          ENUM('present','absent') NOT NULL DEFAULT 'present',
     confidence      FLOAT NULL,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_attendance_student FOREIGN KEY (student_id)

@@ -96,8 +96,8 @@ namespace AttendanceClient.Models
     public class TodaySummary
     {
         public int TotalCount { get; set; }
-        public int PresentCount { get; set; }
-        public int LateCount { get; set; }
+        public int CheckedInCount { get; set; }
+        public int CheckedOutCount { get; set; }
         public int AbsentCount { get; set; }
         public List<TodayAttendanceItem> Items { get; set; }
     }

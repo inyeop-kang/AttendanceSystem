@@ -1,42 +1,50 @@
-<UserControl x:Class="AttendanceClient.Views.StudentsView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Loaded="StudentsView_Loaded">
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="AttendanceClient.Views.StudentsView" Loaded="StudentsView_Loaded">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="12"/>
+            <RowDefinition Height="44"/>
+            <RowDefinition Height="48"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <TextBlock Text="교육생 관리" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,24,0"/>
-            <TextBox x:Name="SearchBox" Width="200" Height="30" VerticalContentAlignment="Center"/>
-            <Button Content="검색" Width="70" Height="30" Margin="8,0,0,0" Click="SearchButton_Click"/>
-            <Button Content="신규 등록" Width="90" Height="30" Margin="24,0,0,0" Click="AddButton_Click"/>
-            <Button Content="새로고침" Width="90" Height="30" Margin="8,0,0,0" Click="RefreshButton_Click"/>
-        </StackPanel>
-
-        <DataGrid x:Name="StudentsGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
-                  SelectionMode="Single">
+        <TextBlock Text="교육생 관리" Style="{StaticResource Heading}" VerticalAlignment="Top"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="76"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="90"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="SearchBox" Height="34" Margin="0,0,8,14" ToolTip="이름 또는 교육생 번호 검색" AutomationProperties.Name="교육생 검색"/>
+            <Button Content="검색" Click="SearchButton_Click" Style="{StaticResource PrimaryButton}" Grid.Column="1" Margin="0,0,8,14"/>
+            <Button Content="신규 등록" Click="AddButton_Click" Style="{StaticResource PrimaryButton}" Grid.Column="2" Margin="0,0,8,14"/>
+            <Button Content="새로고침" Click="RefreshButton_Click" Style="{StaticResource SecondaryButton}" Grid.Column="3" Margin="0,0,0,14"/>
+        </Grid>
+        <DataGrid x:Name="StudentsGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="교육생 번호" Binding="{Binding StudentNo}" Width="120"/>
-                <DataGridTextColumn Header="이름" Binding="{Binding Name}" Width="100"/>
-                <DataGridTextColumn Header="과정명" Binding="{Binding Department}" Width="160"/>
-                <DataGridTextColumn Header="기수" Binding="{Binding Grade}" Width="60"/>
-                <DataGridTextColumn Header="얼굴등록여부" Binding="{Binding HasFaceRegistered}" Width="100"/>
-                <DataGridTemplateColumn Header="작업" Width="260">
+                <DataGridTextColumn Header="교육생 번호" Binding="{Binding StudentNo}" Width="96"/>
+                <DataGridTextColumn Header="이름" Binding="{Binding Name}" Width="72"/>
+                <DataGridTextColumn Header="과정명" Binding="{Binding Department}" Width="*" MinWidth="80"/>
+                <DataGridTextColumn Header="기수" Binding="{Binding Grade}" Width="44"/>
+                <DataGridTemplateColumn Header="얼굴" Width="58">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Style="{StaticResource FaceStatus}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="작업" Width="174">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="얼굴등록" Width="70" Margin="2" Click="FaceRegisterButton_Click" Tag="{Binding}"/>
-                                <Button Content="수정" Width="50" Margin="2" Click="EditButton_Click" Tag="{Binding}"/>
-                                <Button Content="삭제" Width="50" Margin="2" Click="DeleteButton_Click" Tag="{Binding}"/>
+                                <Button Content="얼굴등록" Click="FaceRegisterButton_Click" Style="{StaticResource RowButton}" Tag="{Binding}"/>
+                                <Button Content="수정" Click="EditButton_Click" Style="{StaticResource RowButton}" Tag="{Binding}"/>
+                                <Button Content="삭제" Click="DeleteButton_Click" Style="{StaticResource RowButton}" Tag="{Binding}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <TextBlock Grid.Row="3" Text="교육생을 등록한 후 얼굴등록 버튼으로 촬영할 수 있습니다." Style="{StaticResource Caption}"/>
     </Grid>
 </UserControl>

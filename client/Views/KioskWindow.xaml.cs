@@ -11,7 +11,7 @@ namespace AttendanceClient.Views
 
         private void AdminModeButton_Click(object sender, RoutedEventArgs e)
         {
-            AdminPasswordWindow passwordWindow = new AdminPasswordWindow();
+            AdminPasswordWindow passwordWindow = new AdminPasswordWindow { Owner = this };
             bool confirmed = passwordWindow.ShowDialog() == true;
 
             if (!confirmed)
