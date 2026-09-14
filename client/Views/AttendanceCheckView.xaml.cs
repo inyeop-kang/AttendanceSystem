@@ -195,11 +195,13 @@ namespace AttendanceClient.Views
             {
                 ResultStatusText.Text = "퇴실";
                 ResultStatusText.Foreground = Brushes.SteelBlue;
+                Sound.PlayCheckOut();
             }
             else
             {
                 ResultStatusText.Text = "입실";
                 ResultStatusText.Foreground = Brushes.Green;
+                Sound.PlayCheckIn();
             }
 
             ResultMessageText.Text = response.Message;

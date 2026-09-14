@@ -14,4 +14,11 @@
     <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.13.0.20260627" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- 입실/퇴실 효과음. 빌드 출력 폴더로 그대로 복사되어야 Sound.cs가 런타임에 찾는다. -->
+    <Content Include="Assets\Sounds\*.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
