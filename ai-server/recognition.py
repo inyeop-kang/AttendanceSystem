@@ -45,13 +45,18 @@ def extract_embedding(image):
         )
     except ValueError as error:
         # anti_spoofing=True일 때 DeepFace.represent()는 스푸핑(사진/화면 재생 등)으로
-        # 판단되면 예외를 던진다(deepface/modules/representation.py). 그 외
-        # ValueError(예: 잘못된 이미지 shape)와는 로그로만 구분하고, 둘 다 결과는
-        # 기존과 동일하게 "이 프레임은 못 씀"으로 처리한다.
+        # 판단되면 예외를 던진다(deepface/modules/representation.py). 그런데 이
+        # except 블록은 그 외의 ValueError(설정/의존성 문제 등)도 전부 잡기 때문에,
+        # [2026-09-14] 실제로 torch 미설치로 Fasnet 초기화 자체가 실패하는 걸
+        # "스푸핑 감지"인 줄 알고 조용히 넘어갔던 적이 있다(원인 파악에 시간 소요).
+        # 그래서 모든 ValueError를 콘솔에 남기고, 스푸핑 감지인지 아닌지만 구분한다.
         if "Spoof detected" in str(error):
             print("[extract_embedding] 스푸핑(사진/화면 재생 등)으로 의심되어 이 프레임 거부")
+        else:
+            print(f"[extract_embedding] DeepFace.represent() 실패(스푸핑 아님): {error}")
         return None
-    except Exception:
+    except Exception as error:
+        print(f"[extract_embedding] 예상 못한 에러로 이 프레임 거부: {error}")
         return None
 
     if len(results) == 0:
