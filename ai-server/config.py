@@ -14,6 +14,12 @@ DB_NAME = os.environ.get("ATTENDANCE_DB_NAME", "attendance_system")
 # 실패하는 Windows 환경 문제가 있어 "opencv" 대신 "mtcnn"을 기본값으로 사용한다.
 DETECTOR_BACKEND = "mtcnn"
 
+# [2026-09-14 추가] 사진/화면 재생으로 얼굴인식을 통과시키는 걸 막는다.
+# DeepFace에 내장된 FasNet(Silent-Face-Anti-Spoofing 기반) 모델로 판별하며,
+# 별도 설치 없이 기존 deepface 패키지 안에 이미 들어있다. 오탐이 너무 잦으면
+# 이 값을 false로 바꿔서 끌 수 있다(재빌드/재배포 없이 환경변수로도 가능).
+ANTI_SPOOFING_ENABLED = os.environ.get("ATTENDANCE_ANTI_SPOOFING", "true").lower() != "false"
+
 # Facenet512보다 사람 간 구별력이 더 뛰어난 ArcFace를 사용한다.
 # (Additive Angular Margin Loss로 학습되어 동일인은 더 가깝게, 타인은 더 멀게 임베딩되도록 설계된 모델)
 # 모델을 바꾸면 임베딩 값 자체가 완전히 달라지므로 기존에 등록된 얼굴은 재등록이 필요하다.

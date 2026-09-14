@@ -26,7 +26,8 @@ def is_blurry(image):
 
 def extract_embedding(image):
     """이미지 한 장에서 얼굴을 검출하고 임베딩을 추출한다.
-    얼굴이 없거나 흐릿하면 None을 반환한다.
+    얼굴이 없거나 흐릿하거나(스푸핑 검사가 켜져 있고) 사진/화면 재생으로 의심되면
+    None을 반환한다.
     """
     if image is None:
         return None
@@ -40,7 +41,16 @@ def extract_embedding(image):
             model_name=config.MODEL_NAME,
             detector_backend=config.DETECTOR_BACKEND,
             enforce_detection=True,
+            anti_spoofing=config.ANTI_SPOOFING_ENABLED,
         )
+    except ValueError as error:
+        # anti_spoofing=True일 때 DeepFace.represent()는 스푸핑(사진/화면 재생 등)으로
+        # 판단되면 예외를 던진다(deepface/modules/representation.py). 그 외
+        # ValueError(예: 잘못된 이미지 shape)와는 로그로만 구분하고, 둘 다 결과는
+        # 기존과 동일하게 "이 프레임은 못 씀"으로 처리한다.
+        if "Spoof detected" in str(error):
+            print("[extract_embedding] 스푸핑(사진/화면 재생 등)으로 의심되어 이 프레임 거부")
+        return None
     except Exception:
         return None
 
