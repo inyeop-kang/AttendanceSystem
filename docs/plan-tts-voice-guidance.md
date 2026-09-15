@@ -1,6 +1,11 @@
 # 계획안: 실패 사유별 음성 안내 (TTS)
 
-상태: **코드 구조 완료, mp3 미생성** — 2026-09-14 작성, 2026-09-15 갱신
+상태: **완료 — mp3 8개 생성 및 재생 확인** — 2026-09-14 작성, 2026-09-15 완료
+
+2026-09-15 완료: Typecast API 키 발급받아 `scripts/generate_tts_assets.ps1` 실행,
+목소리는 `tc_69f2e455ea79fd197aa0476f`(서현, 여성/young_adult, Announcer 용도)로 선택.
+8개 mp3 전부 생성 확인(320kbps/44.1kHz mp3, 각 30~98KB), 빌드 후
+`client/bin/Debug/net10.0-windows/Assets/Sounds/`에 자동 복사되는 것까지 확인함.
 
 2026-09-15 진행: Typecast API 키가 아직 없어서 실제 mp3 생성/재생 확인은 못 했지만,
 "파일이 생기면 바로 재생되는" 코드 구조는 먼저 만들어 둠 (`Sound.cs`의 각 재생 함수는

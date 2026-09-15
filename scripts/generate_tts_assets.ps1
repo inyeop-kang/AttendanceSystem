@@ -1,4 +1,4 @@
-# generate_tts_assets.ps1 - Typecast API로 입/퇴실·실패 안내 음성(mp3) 8개를 한 번만 생성해 둔다.
+﻿# generate_tts_assets.ps1 - Typecast API로 입/퇴실·실패 안내 음성(mp3) 8개를 한 번만 생성해 둔다.
 #
 # docs\plan-tts-voice-guidance.md에서 결정한 대로, 매 이벤트마다 API를 호출하지 않고
 # 문구별로 한 번씩만 생성해서 client\Assets\Sounds\에 mp3로 저장한다. 이후 실행 시점에는
