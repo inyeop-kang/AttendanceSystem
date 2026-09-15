@@ -3,3 +3,8 @@ tf-keras==2.17.0
 opencv-python==4.10.0.84
 numpy==1.26.4
 pymysql==1.1.1
+
+# anti_spoofing=True(config.ANTI_SPOOFING_ENABLED)를 쓰려면 deepface의 FasNet이
+# torch를 요구한다(deepface/models/spoofing/FasNet.py). CPU 전용 빌드로 설치.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0+cpu
