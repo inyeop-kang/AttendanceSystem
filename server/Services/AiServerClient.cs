@@ -28,6 +28,9 @@ namespace AttendanceServer.Services
         public int StudentId { get; set; }
 
         public double Similarity { get; set; }
+
+        // "spoof_suspected" 등 매칭 실패 사유. 없으면 null.
+        public string Reason { get; set; }
     }
 
     public class AiServerClient

@@ -103,6 +103,8 @@ namespace AttendanceClient.Views
             catch
             {
                 StatusText.Text = "서버 전송에 실패했습니다.";
+                Sound.PlaySendFailure();
+                MessageBox.Show(StatusText.Text, "연결 오류");
                 CaptureButton.IsEnabled = true;
                 return;
             }

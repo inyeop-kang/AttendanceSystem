@@ -32,6 +32,8 @@ namespace AttendanceClient.Views
             catch
             {
                 MessageText.Text = "서버에 연결할 수 없습니다.";
+                Sound.PlayConnectionError();
+                MessageBox.Show(MessageText.Text, "연결 오류");
                 return;
             }
 

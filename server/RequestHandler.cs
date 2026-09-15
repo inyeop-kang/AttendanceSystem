@@ -355,7 +355,10 @@ namespace AttendanceServer
             if (!result.Matched)
             {
                 response.Matched = false;
-                response.Message = "등록되지 않은 사용자입니다. (인식 실패)";
+                response.SoundKey = result.Reason == "spoof_suspected" ? "spoof_suspected" : "no_match";
+                response.Message = result.Reason == "spoof_suspected"
+                    ? "사진(정지 화면)으로 의심되어 인식이 거부되었습니다. 실제 얼굴로 다시 시도해 주세요."
+                    : "등록되지 않은 사용자입니다. (인식 실패)";
                 return null;
             }
 
@@ -364,6 +367,7 @@ namespace AttendanceServer
             if (student == null)
             {
                 response.Matched = false;
+                response.SoundKey = "no_match";
                 response.Message = "등록되지 않은 사용자입니다. (인식 실패)";
                 return null;
             }

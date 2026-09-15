@@ -14,7 +14,10 @@ def handle_extract_embeddings(request):
     embeddings = []
     for image_base64 in images:
         image = recognition.decode_base64_image(image_base64)
-        embedding = recognition.extract_embedding(image)
+        try:
+            embedding = recognition.extract_embedding(image)
+        except recognition.SpoofDetectedError:
+            continue
         if embedding is not None:
             embeddings.append(embedding)
 
@@ -40,10 +43,16 @@ def handle_recognize(request):
     best_student_id = None
     best_similarity = 0.0
     best_second_similarity = 0.0
+    spoof_detected = False
 
     for image_base64 in images:
         image = recognition.decode_base64_image(image_base64)
-        embedding = recognition.extract_embedding(image)
+
+        try:
+            embedding = recognition.extract_embedding(image)
+        except recognition.SpoofDetectedError:
+            spoof_detected = True
+            continue
 
         if embedding is None:
             continue
@@ -58,7 +67,10 @@ def handle_recognize(request):
     if best_student_id is None or best_similarity < threshold:
         if best_student_id is None:
             best_student_id = 0
-        return {"matched": False, "student_id": best_student_id, "similarity": best_similarity}
+        result = {"matched": False, "student_id": best_student_id, "similarity": best_similarity}
+        if spoof_detected:
+            result["reason"] = "spoof_suspected"
+        return result
 
     margin = best_similarity - best_second_similarity
     if margin < config.MARGIN_THRESHOLD:

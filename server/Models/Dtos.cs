@@ -60,6 +60,9 @@ namespace AttendanceServer.Models
     {
         public bool Matched { get; set; }
         public string Message { get; set; }
+        // 인식 실패 시 사유 코드("spoof_suspected"/"no_match"). 클라이언트가 이 값으로
+        // 재생할 음성(mp3)을 고른다 — Message는 화면 표시용 문구라 음성 문구와 다를 수 있음.
+        public string SoundKey { get; set; }
         public int StudentId { get; set; }
         public string StudentNo { get; set; }
         public string Name { get; set; }
