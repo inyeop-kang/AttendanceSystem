@@ -76,10 +76,26 @@ def find_best_match(embedding, known_embeddings):
     학생별로 가장 높은 유사도를 대표값으로 삼아, 1위 학생과 그 유사도, 2위 학생의 유사도를 반환한다.
     (1위 student_id, 1위 유사도, 2위 유사도) 형태이며 등록자가 없으면 (None, 0.0, 0.0)이다.
     2위 후보가 없으면(등록자가 1명뿐이면) 2위 유사도는 0.0으로 반환되어 마진 검증이 자동으로 통과된다.
+
+    [2026-09-14 추가] db.fetch_all_embeddings()가 model_name으로 걸러주긴 하지만, 그
+    라벨과 실제 벡터 차원이 어긋난 오염 데이터(예: 예전 스텁/테스트로 넣은 값)가 섞여
+    있으면 cosine_similarity 내부의 np.dot이 차원 불일치로 예외를 던져서 이 요청 전체가
+    실패한다 — 문제를 일으킨 학생 한 명이 아니라 인식 시도 전원이 실패로 처리된다.
+    실제로 이 문제를 겪었다: 3차원짜리 데모 데이터 1건이 섞여 있어서 등록된 다른
+    학생 전원의 얼굴인식이 계속 실패했다(정상 데이터는 ArcFace 기준 512차원).
+    아래에서 기준 임베딩(embedding)과 차원이 다른 known_embedding은 비교 없이 건너뛴다.
     """
     best_similarity_by_student = {}
+    expected_dim = len(embedding)
 
     for student_id, known_embedding in known_embeddings:
+        if len(known_embedding) != expected_dim:
+            print(
+                f"[find_best_match] student_id={student_id} 임베딩 차원 불일치"
+                f"(기대 {expected_dim}, 실제 {len(known_embedding)}) - 비교에서 제외"
+            )
+            continue
+
         similarity = cosine_similarity(embedding, known_embedding)
         current_best = best_similarity_by_student.get(student_id, 0.0)
 
