@@ -71,6 +71,8 @@
 
 | 사유 코드 (`SoundKey`) | 파일명 | 녹음할 축약 문구 | 발생 위치 |
 |---|---|---|---|
+| (없음, 클라이언트 로컬) | `checkin_voice.mp3` | "입실하셨습니다" | `AttendanceCheckView` (입실 성공, 이름 없이 고정 문구) |
+| (없음, 클라이언트 로컬) | `checkout_voice.mp3` | "퇴실하셨습니다" | `AttendanceCheckView` (퇴실 성공, 이름 없이 고정 문구) |
 | `spoof_suspected` | `spoof_suspected.mp3` | "사진이 감지되었습니다" | `AttendanceCheckView` (인식 실패, 서버가 `Reason: spoof_suspected` 응답) |
 | `no_match` | `no_match.mp3` | "등록되지 않은 사용자입니다" | `AttendanceCheckView` (인식 실패, 그 외 사유) |
 | (없음, 클라이언트 로컬) | `connection_error.mp3` | "서버에 연결할 수 없습니다" | `LoginWindow`, `AdminPasswordWindow` (연결 예외) |
@@ -110,8 +112,9 @@
   $env:TYPECAST_API_KEY = "발급받은 키"
   .\scripts\generate_tts_assets.ps1 -VoiceId "tc_xxxxxxxxxxxxxxxxxxxxxxxx"
   ```
-  `client/Assets/Sounds/`에 mp3 6개가 자동 생성됨. 파일만 생기면 코드 수정 없이 바로
+  `client/Assets/Sounds/`에 mp3 8개가 자동 생성됨. 파일만 생기면 코드 수정 없이 바로
   재생됨 (`Sound.Play()`가 파일 없으면 조용히 무시하도록 이미 방어되어 있어서, 지금
   상태로 빌드/실행해도 기존 동작은 그대로임).
-- 성공 상황(입실/퇴실)에도 이름을 불러주는 음성을 추가할지 — 이건 매번 다른 텍스트라
-  실시간 API가 필요해지는 케이스이므로 별도 계획으로 다룬다.
+- 이름을 불러주는 음성("OOO님, 입실하셨습니다"처럼 학생 이름 포함)은 매번 다른 텍스트라
+  실시간 API가 필요해지는 케이스이므로 별도 계획으로 다룬다. `checkin_voice`/
+  `checkout_voice`는 이름 없는 고정 문구라 이번 계획(사전 생성 방식) 범위에 포함됨.

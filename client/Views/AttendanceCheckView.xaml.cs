@@ -207,12 +207,14 @@ namespace AttendanceClient.Views
                 ResultStatusText.Text = "퇴실";
                 ResultStatusText.Foreground = Brushes.SteelBlue;
                 Sound.PlayCheckOut();
+                Sound.PlayCheckOutVoice();
             }
             else
             {
                 ResultStatusText.Text = "입실";
                 ResultStatusText.Foreground = Brushes.Green;
                 Sound.PlayCheckIn();
+                Sound.PlayCheckInVoice();
             }
 
             ResultMessageText.Text = response.Message;

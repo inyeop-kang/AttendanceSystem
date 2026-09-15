@@ -1,4 +1,4 @@
-# generate_tts_assets.ps1 - Typecast API로 실패 안내 음성(mp3) 6개를 한 번만 생성해 둔다.
+# generate_tts_assets.ps1 - Typecast API로 입/퇴실·실패 안내 음성(mp3) 8개를 한 번만 생성해 둔다.
 #
 # docs\plan-tts-voice-guidance.md에서 결정한 대로, 매 이벤트마다 API를 호출하지 않고
 # 문구별로 한 번씩만 생성해서 client\Assets\Sounds\에 mp3로 저장한다. 이후 실행 시점에는
@@ -40,7 +40,10 @@ $outDir = Join-Path $root "client\Assets\Sounds"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 # 사유 코드 -> 녹음 문구. docs\plan-tts-voice-guidance.md의 확정 문구 표와 항상 동일하게 유지할 것.
+# 키 이름이 그대로 파일명(<키>.mp3)이 된다.
 $phrases = [ordered]@{
+    "checkin_voice"    = "입실하셨습니다"
+    "checkout_voice"   = "퇴실하셨습니다"
     "spoof_suspected"  = "사진이 감지되었습니다"
     "no_match"         = "등록되지 않은 사용자입니다"
     "connection_error" = "서버에 연결할 수 없습니다"
