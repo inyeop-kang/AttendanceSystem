@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AttendanceServer.Data;
@@ -38,8 +37,6 @@ namespace AttendanceServer
         public async Task<string> Handle(string requestJson)
         {
             object response;
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            string timedAction = "unknown";
 
             try
             {
@@ -47,7 +44,6 @@ namespace AttendanceServer
                 {
                     JsonElement root = doc.RootElement;
                     string action = GetString(root, "action");
-                    timedAction = action;
 
                     if (action == "login")
                     {
@@ -85,6 +81,10 @@ namespace AttendanceServer
                     {
                         response = HandleGetAttendanceSummary(root);
                     }
+                    else if (action == "getStudentStats")
+                    {
+                        response = HandleGetStudentStats(root);
+                    }
                     else
                     {
                         StudentCreateResult errorResult = new StudentCreateResult();
@@ -100,10 +100,7 @@ namespace AttendanceServer
                 response = errorResult;
             }
 
-            string responseJson = JsonSerializer.Serialize(response);
-            stopwatch.Stop();
-            Console.WriteLine("[timing] action=" + timedAction + " " + stopwatch.ElapsedMilliseconds + "ms");
-            return responseJson;
+            return JsonSerializer.Serialize(response);
         }
 
         // ------------------------------------------------------------
@@ -182,10 +179,7 @@ namespace AttendanceServer
                 return response;
             }
 
-            Stopwatch bcryptWatch = Stopwatch.StartNew();
             bool valid = BCrypt.Net.BCrypt.Verify(password, passwordHash);
-            bcryptWatch.Stop();
-            Console.WriteLine("[timing]   bcrypt.Verify " + bcryptWatch.ElapsedMilliseconds + "ms");
 
             if (!valid)
             {
@@ -384,33 +378,18 @@ namespace AttendanceServer
 
             if (existing != null)
             {
-                response.Status = existing.Status;
+                response.Status = existing.CheckOutTime == DateTime.MinValue ? "checked_in" : "checked_out";
                 response.CheckInTime = existing.CheckInTime;
                 response.CheckOutTime = existing.CheckOutTime;
                 response.Message = student.Name + "님은 오늘 이미 입실 처리되었습니다.";
                 return response;
             }
 
-            string status = "present";
+            attendanceRepository.CreateCheckIn(student.Id, now, "present", response.Confidence);
 
-            if (now.TimeOfDay > Config.LateCutoffTime)
-            {
-                status = "late";
-            }
-
-            attendanceRepository.CreateCheckIn(student.Id, now, status, response.Confidence);
-
-            response.Status = status;
+            response.Status = "checked_in";
             response.CheckInTime = now;
-
-            if (status == "late")
-            {
-                response.Message = student.Name + "님, 지각 입실 처리되었습니다.";
-            }
-            else
-            {
-                response.Message = student.Name + "님, 입실 처리되었습니다.";
-            }
+            response.Message = student.Name + "님, 입실 처리되었습니다.";
 
             return response;
         }
@@ -435,11 +414,11 @@ namespace AttendanceServer
                 return response;
             }
 
-            response.Status = existing.Status;
             response.CheckInTime = existing.CheckInTime;
 
             if (existing.CheckOutTime != DateTime.MinValue)
             {
+                response.Status = "checked_out";
                 response.CheckOutTime = existing.CheckOutTime;
                 response.Message = student.Name + "님은 오늘 이미 퇴실 처리되었습니다.";
                 return response;
@@ -447,6 +426,7 @@ namespace AttendanceServer
 
             attendanceRepository.SetCheckOut(student.Id, now, now);
 
+            response.Status = "checked_out";
             response.CheckOutTime = now;
             response.Message = student.Name + "님, 퇴실 처리되었습니다.";
             return response;
@@ -475,19 +455,19 @@ namespace AttendanceServer
             TodaySummary summary = new TodaySummary();
             summary.Items = items;
             summary.TotalCount = items.Count;
-            summary.PresentCount = 0;
-            summary.LateCount = 0;
+            summary.CheckedInCount = 0;
+            summary.CheckedOutCount = 0;
             summary.AbsentCount = 0;
 
             foreach (TodayAttendanceItem item in items)
             {
-                if (item.Status == "present")
+                if (item.Status == "checked_in")
                 {
-                    summary.PresentCount = summary.PresentCount + 1;
+                    summary.CheckedInCount = summary.CheckedInCount + 1;
                 }
-                else if (item.Status == "late")
+                else if (item.Status == "checked_out")
                 {
-                    summary.LateCount = summary.LateCount + 1;
+                    summary.CheckedOutCount = summary.CheckedOutCount + 1;
                 }
                 else
                 {
@@ -496,6 +476,141 @@ namespace AttendanceServer
             }
 
             return summary;
+        }
+
+        // ------------------------------------------------------------
+        // 교육생 개별 통계
+        // ------------------------------------------------------------
+
+        private static string FormatTimeOfDay(TimeSpan value)
+        {
+            int hours = (int)value.TotalHours;
+            return hours.ToString("00") + ":" + value.Minutes.ToString("00");
+        }
+
+        private static string FormatDuration(TimeSpan value)
+        {
+            int hours = (int)value.TotalHours;
+            return hours + "시간 " + value.Minutes + "분";
+        }
+
+        private StudentStatsResponse HandleGetStudentStats(JsonElement root)
+        {
+            int studentId = GetInt(root, "studentId");
+            DateTime rangeStart = ParseDateOrToday(GetString(root, "startDate"));
+            DateTime rangeEnd = ParseDateOrToday(GetString(root, "endDate"));
+
+            StudentStatsResponse response = new StudentStatsResponse();
+            response.Items = new List<StudentStatsItem>();
+            response.StartDate = rangeStart.ToString("yyyy-MM-dd");
+            response.EndDate = rangeEnd.ToString("yyyy-MM-dd");
+
+            Student student = studentRepository.GetById(studentId);
+
+            if (student == null)
+            {
+                response.Success = false;
+                response.Message = "교육생을 찾을 수 없습니다.";
+                return response;
+            }
+
+            response.Success = true;
+            response.Message = "";
+            response.StudentId = student.Id;
+            response.StudentNo = student.StudentNo;
+            response.Name = student.Name;
+            response.Department = student.Department;
+            response.Grade = student.Grade;
+
+            List<AttendanceRecord> records = attendanceRepository.GetListByStudentAndDateRange(student.Id, rangeStart, rangeEnd);
+
+            // 날짜별로 빨리 찾을 수 있게 정리해 둔다.
+            Dictionary<DateTime, AttendanceRecord> recordByDate = new Dictionary<DateTime, AttendanceRecord>();
+
+            foreach (AttendanceRecord record in records)
+            {
+                recordByDate[record.AttendanceDate.Date] = record;
+            }
+
+            // 기간 안에서 교육이 진행된 날. 전체 교육생의 출결 기록에서 뽑으므로
+            // 이 교육생 본인의 기록 날짜도 모두 포함된다.
+            List<DateTime> operatingDates = attendanceRepository.GetOperatingDates(rangeStart, rangeEnd);
+
+            TimeSpan checkInSum = TimeSpan.Zero;
+            int checkInCount = 0;
+            TimeSpan checkOutSum = TimeSpan.Zero;
+            int checkOutCount = 0;
+            TimeSpan staySum = TimeSpan.Zero;
+            int stayCount = 0;
+
+            foreach (DateTime date in operatingDates)
+            {
+                StudentStatsItem item = new StudentStatsItem();
+                item.Date = date.ToString("yyyy-MM-dd");
+
+                AttendanceRecord record;
+                bool found = recordByDate.TryGetValue(date.Date, out record);
+
+                if (!found || record.CheckInTime == DateTime.MinValue)
+                {
+                    item.Status = "absent";
+                    item.CheckInTime = "";
+                    item.CheckOutTime = "";
+                    item.StayDuration = "";
+                    response.AbsentDayCount = response.AbsentDayCount + 1;
+                    response.Items.Add(item);
+                    continue;
+                }
+
+                response.PresentDayCount = response.PresentDayCount + 1;
+
+                item.CheckInTime = record.CheckInTime.ToString("HH:mm:ss");
+                checkInSum = checkInSum + record.CheckInTime.TimeOfDay;
+                checkInCount = checkInCount + 1;
+
+                if (record.CheckOutTime == DateTime.MinValue)
+                {
+                    item.Status = "checked_in";
+                    item.CheckOutTime = "";
+                    item.StayDuration = "";
+                    response.MissingCheckOutCount = response.MissingCheckOutCount + 1;
+                }
+                else
+                {
+                    item.Status = "checked_out";
+                    item.CheckOutTime = record.CheckOutTime.ToString("HH:mm:ss");
+                    checkOutSum = checkOutSum + record.CheckOutTime.TimeOfDay;
+                    checkOutCount = checkOutCount + 1;
+
+                    TimeSpan stay = record.CheckOutTime - record.CheckInTime;
+
+                    if (stay < TimeSpan.Zero)
+                    {
+                        stay = TimeSpan.Zero;
+                    }
+
+                    item.StayDuration = FormatDuration(stay);
+                    staySum = staySum + stay;
+                    stayCount = stayCount + 1;
+                }
+
+                response.Items.Add(item);
+            }
+
+            response.OperatingDayCount = operatingDates.Count;
+
+            if (response.OperatingDayCount > 0)
+            {
+                double rate = (double)response.PresentDayCount * 100.0 / (double)response.OperatingDayCount;
+                response.AttendanceRate = Math.Round(rate, 1);
+            }
+
+            response.AverageCheckInTime = checkInCount > 0 ? FormatTimeOfDay(new TimeSpan(checkInSum.Ticks / checkInCount)) : "-";
+            response.AverageCheckOutTime = checkOutCount > 0 ? FormatTimeOfDay(new TimeSpan(checkOutSum.Ticks / checkOutCount)) : "-";
+            response.AverageStayDuration = stayCount > 0 ? FormatDuration(new TimeSpan(staySum.Ticks / stayCount)) : "-";
+            response.TotalStayDuration = stayCount > 0 ? FormatDuration(staySum) : "-";
+
+            return response;
         }
     }
 

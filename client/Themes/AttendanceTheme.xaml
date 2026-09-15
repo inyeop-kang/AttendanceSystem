@@ -85,13 +85,13 @@
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="Padding" Value="10,0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
                     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
@@ -106,13 +106,13 @@
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="Padding" Value="10,0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="PasswordBox">
                     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
@@ -169,13 +169,13 @@
         <Setter Property="Text" Value="{Binding Status}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Status}" Value="present">
-                <Setter Property="Text" Value="출석"/>
-                <Setter Property="Foreground" Value="#237350"/>
+            <DataTrigger Binding="{Binding Status}" Value="checked_in">
+                <Setter Property="Text" Value="입실"/>
+                <Setter Property="Foreground" Value="#245C8A"/>
             </DataTrigger>
-            <DataTrigger Binding="{Binding Status}" Value="late">
-                <Setter Property="Text" Value="지각"/>
-                <Setter Property="Foreground" Value="#8A5B13"/>
+            <DataTrigger Binding="{Binding Status}" Value="checked_out">
+                <Setter Property="Text" Value="퇴실"/>
+                <Setter Property="Foreground" Value="#617183"/>
             </DataTrigger>
             <DataTrigger Binding="{Binding Status}" Value="absent">
                 <Setter Property="Text" Value="결석"/>

@@ -74,7 +74,7 @@ dotnet run
 - 로그인 화면에서 프로젝트 관리자가 안내한 관리자 계정으로 로그인합니다.
 - 로그인 후 "관리자 모드"(전체 메뉴) 또는 "출석 키오스크 시작"(얼굴인식 출석체크 화면만, 다른 화면 접근 불가) 중 선택합니다.
   - 교육생이 직접 출석 체크를 하는 실사용 환경에서는 항상 "출석 키오스크"로 실행해야 교육생 관리·대시보드 등에 접근하지 못합니다.
-  - 키오스크 화면 우측 상단의 "관리자 모드로 전환" 버튼은 관리자 비밀번호를 입력해야만 동작합니다.
+  - 키오스크 화면 우측 상단의 "관리화면으로 변경" 버튼은 관리자 비밀번호를 입력해야만 동작합니다.
 - 관리자 모드에서 교육생 관리 → 신규 등록 → (등록 직후 뜨는 얼굴 등록 안내에서 예 선택) 순으로 교육생을 등록합니다.
 
 ## 5. Figma 디자인과 WPF 연결
@@ -111,6 +111,7 @@ Figma 파일은 실행 프로그램과 자동 동기화되지 않습니다. 디�
 | 로그인 | `client/LoginWindow.xaml` | `LoginButton_Click` → `ApiClient.Login` |
 | 모드 선택 | `client/ModeSelectWindow.xaml` | 관리자 창 또는 키오스크 창 열기 |
 | 출석 현황 | `client/Views/AttendanceTodayView.xaml` | 기간 선택 → `ApiClient.GetAttendanceSummary` |
+| 교육생 개별 통계 | `client/Views/StudentStatsView.xaml` | 교육생·기간 선택 → `ApiClient.GetStudentStats` |
 | 교육생 관리 | `client/Views/StudentsView.xaml` | 검색·등록·수정·삭제·얼굴 등록 창 열기 |
 | 교육생 등록·수정 | `client/Views/StudentEditWindow.xaml` | `CreateStudent` 또는 `UpdateStudent` |
 | 얼굴 등록 | `client/Views/FaceRegisterWindow.xaml` | 연속 촬영 → `ApiClient.RegisterFace` |

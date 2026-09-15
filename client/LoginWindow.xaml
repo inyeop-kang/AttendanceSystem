@@ -7,11 +7,9 @@
         <Border Background="{StaticResource Navy}" Padding="34">
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="ATTENDANCE MANAGEMENT" Foreground="#B4C5D4" FontSize="10" Margin="0,0,0,48"/>
-                <TextBlock Text="얼굴로 확인하고,
-정확하게 기록합니다." Foreground="White" FontSize="26" FontWeight="Bold"/>
+                <TextBlock Text="얼굴로 확인하고,&#10;정확하게 기록합니다." Foreground="White" FontSize="26" FontWeight="Bold" TextWrapping="Wrap"/>
                 <TextBlock Text="교육생 출결 관리 시스템" Foreground="#CAD6E0" Margin="0,18,0,0"/>
-                <TextBlock Text="교육생 등록부터 입실·퇴실 기록까지
-하나의 프로그램에서 관리하세요." Foreground="#CAD6E0" Margin="0,14,0,0" FontSize="11"/>
+                <TextBlock Text="교육생 등록부터 입실·퇴실 기록까지&#10;하나의 프로그램에서 관리하세요." Foreground="#CAD6E0" Margin="0,14,0,0" FontSize="11" TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
         <Border Grid.Column="1" Background="White" Padding="54,24">

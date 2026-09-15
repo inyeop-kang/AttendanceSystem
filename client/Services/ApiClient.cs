@@ -139,5 +139,15 @@ namespace AttendanceClient.Services
             request["endDate"] = endDate.ToString("yyyy-MM-dd");
             return await Send<TodaySummary>(request);
         }
+
+        public static async Task<StudentStatsResponse> GetStudentStats(int studentId, DateTime startDate, DateTime endDate)
+        {
+            Dictionary<string, object> request = new Dictionary<string, object>();
+            request["action"] = "getStudentStats";
+            request["studentId"] = studentId;
+            request["startDate"] = startDate.ToString("yyyy-MM-dd");
+            request["endDate"] = endDate.ToString("yyyy-MM-dd");
+            return await Send<StudentStatsResponse>(request);
+        }
     }
 }

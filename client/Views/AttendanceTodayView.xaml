@@ -28,14 +28,14 @@
             </Border>
             <Border Style="{StaticResource Card}" Margin="0,0,8,0" Padding="12">
                 <Grid>
-                    <TextBlock Text="출석" Foreground="{StaticResource Muted}" VerticalAlignment="Top" FontSize="11"/>
-                    <TextBlock x:Name="PresentCountText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#237350" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                    <TextBlock Text="입실" Foreground="{StaticResource Muted}" VerticalAlignment="Top" FontSize="11"/>
+                    <TextBlock x:Name="CheckedInCountText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#245C8A" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                 </Grid>
             </Border>
             <Border Style="{StaticResource Card}" Margin="0,0,8,0" Padding="12">
                 <Grid>
-                    <TextBlock Text="지각" Foreground="{StaticResource Muted}" VerticalAlignment="Top" FontSize="11"/>
-                    <TextBlock x:Name="LateCountText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#8A5B13" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                    <TextBlock Text="퇴실" Foreground="{StaticResource Muted}" VerticalAlignment="Top" FontSize="11"/>
+                    <TextBlock x:Name="CheckedOutCountText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#617183" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                 </Grid>
             </Border>
             <Border Style="{StaticResource Card}" Margin="0,0,8,0" Padding="12">

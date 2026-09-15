@@ -11,6 +11,7 @@
                     <TextBlock Text="관리자" Foreground="#B4C5D4" FontSize="11" Margin="0,0,0,24"/>
                     <Button Content="출석 현황" Click="AttendanceTodayButton_Click" Style="{StaticResource NavButton}" x:Name="AttendanceTodayButton"/>
                     <Button Content="교육생 관리" Click="StudentsButton_Click" Style="{StaticResource NavButton}" x:Name="StudentsButton"/>
+                    <Button Content="개별 통계" Click="StudentStatsButton_Click" Style="{StaticResource NavButton}" x:Name="StudentStatsButton"/>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
                     <Button Content="출석 모드로 전환" Click="AttendanceCheckButton_Click" Style="{StaticResource NavButton}" x:Name="AttendanceCheckButton" FontSize="11" Padding="5,6"/>

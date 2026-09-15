@@ -11,8 +11,7 @@
                 <StackPanel>
                     <TextBlock Text="01" Foreground="{StaticResource Navy}" FontWeight="Bold"/>
                     <TextBlock Text="관리자 모드" FontSize="22" FontWeight="Bold" Margin="0,18,0,12"/>
-                    <TextBlock Text="출석 현황을 조회하고
-교육생과 얼굴 정보를 관리합니다." Foreground="{StaticResource Muted}" LineHeight="21" Margin="0,0,0,24"/>
+                    <TextBlock Text="출석 현황을 조회하고&#10;교육생과 얼굴 정보를 관리합니다." Foreground="{StaticResource Muted}" LineHeight="21" Margin="0,0,0,24" TextWrapping="Wrap"/>
                     <Button Content="관리자 모드 시작" Click="AdminModeButton_Click" Style="{StaticResource PrimaryButton}"/>
                 </StackPanel>
             </Border>
@@ -20,8 +19,7 @@
                 <StackPanel>
                     <TextBlock Text="02" Foreground="{StaticResource Navy}" FontWeight="Bold"/>
                     <TextBlock Text="출석 키오스크" FontSize="22" FontWeight="Bold" Margin="0,18,0,12"/>
-                    <TextBlock Text="얼굴 인식으로
-교육생의 입실·퇴실을 기록합니다." Foreground="{StaticResource Muted}" LineHeight="21" Margin="0,0,0,24"/>
+                    <TextBlock Text="얼굴 인식으로&#10;교육생의 입실·퇴실을 기록합니다." Foreground="{StaticResource Muted}" LineHeight="21" Margin="0,0,0,24" TextWrapping="Wrap"/>
                     <Button Content="출석 키오스크 시작" Click="KioskModeButton_Click" Style="{StaticResource PrimaryButton}"/>
                 </StackPanel>
             </Border>
