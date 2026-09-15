@@ -166,6 +166,7 @@ namespace AttendanceClient.Views
             catch
             {
                 ResultMessageText.Text = "서버 통신에 실패했습니다.";
+                Sound.PlayCommFailure();
                 SetCaptureButtonsEnabled(true);
                 return;
             }
@@ -184,6 +185,16 @@ namespace AttendanceClient.Views
                 ResultStatusText.Text = "";
                 ResultStatusText.Foreground = Brushes.Black;
                 ResultMessageText.Text = response.Message;
+
+                if (response.SoundKey == "spoof_suspected")
+                {
+                    Sound.PlaySpoofSuspected();
+                }
+                else
+                {
+                    Sound.PlayNoMatch();
+                }
+
                 return;
             }
 

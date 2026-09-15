@@ -1,6 +1,12 @@
 # 계획안: 실패 사유별 음성 안내 (TTS)
 
-상태: **계획 단계 (미착수)** — 2026-09-14 작성
+상태: **코드 구조 완료, mp3 미생성** — 2026-09-14 작성, 2026-09-15 갱신
+
+2026-09-15 진행: Typecast API 키가 아직 없어서 실제 mp3 생성/재생 확인은 못 했지만,
+"파일이 생기면 바로 재생되는" 코드 구조는 먼저 만들어 둠 (`Sound.cs`의 각 재생 함수는
+파일이 없으면 조용히 무시하도록 이미 그렇게 구현되어 있어서, 이 상태로도 기존 동작을
+깨지 않는다). 아래 표의 파일명으로 mp3를 `client/Assets/Sounds/`에 넣기만 하면 바로
+동작한다.
 
 ## 배경
 
@@ -58,25 +64,54 @@
 | 교육생 저장 실패 | "저장에 실패했습니다. (교육생 번호 중복 또는 서버 오류)" | `client/Views/StudentEditWindow.xaml.cs` |
 | 출석체크 서버 통신 실패 | "서버 통신에 실패했습니다." | `client/Views/AttendanceCheckView.xaml.cs` |
 
-문구를 음성으로 그대로 읽기엔 너무 긴 것도 있어서(예: 교육생 저장 실패), 실제 녹음
-문구는 이 표의 원문을 그대로 쓰지 않고 짧게 다듬을 수 있다 (예: "저장에 실패했습니다"만).
-이 부분은 착수 시점에 다시 정한다.
+문구는 원문 그대로 쓰지 않고 축약하기로 결정 (2026-09-15). 실제 녹음할 축약 문구와
+파일명은 아래 표로 확정한다.
 
-## 구현 순서 (착수 시)
+## 확정된 녹음 문구 / 파일명 (2026-09-15)
 
-1. Typecast에서 위 문구(또는 다듬은 축약형)를 화자/톤 하나로 통일해서 mp3로 생성.
-2. `client/Assets/Sounds/`에 `spoof_suspected.mp3`, `no_match.mp3`,
-   `connection_error.mp3` 등 파일명으로 저장 (사유 코드와 1:1 대응되게).
+| 사유 코드 (`SoundKey`) | 파일명 | 녹음할 축약 문구 | 발생 위치 |
+|---|---|---|---|
+| `spoof_suspected` | `spoof_suspected.mp3` | "사진이 감지되었습니다" | `AttendanceCheckView` (인식 실패, 서버가 `Reason: spoof_suspected` 응답) |
+| `no_match` | `no_match.mp3` | "등록되지 않은 사용자입니다" | `AttendanceCheckView` (인식 실패, 그 외 사유) |
+| (없음, 클라이언트 로컬) | `connection_error.mp3` | "서버에 연결할 수 없습니다" | `LoginWindow`, `AdminPasswordWindow` (연결 예외) |
+| (없음, 클라이언트 로컬) | `send_failure.mp3` | "전송에 실패했습니다" | `FaceRegisterWindow` (연결 예외) |
+| (없음, 클라이언트 로컬) | `save_failure.mp3` | "저장에 실패했습니다" | `StudentEditWindow` (연결 예외) |
+| (없음, 클라이언트 로컬) | `comm_failure.mp3` | "통신에 실패했습니다" | `AttendanceCheckView` (체크인/아웃 요청 자체가 실패한 예외) |
+
+`spoof_suspected`/`no_match`는 서버가 판단하는 사유라서, 서버가 화면 표시용 `Message`와
+별도로 `AttendanceCheckResponse.SoundKey`(신규 필드, `server/Models/Dtos.cs` +
+`client/Models/Dtos.cs`)에 사유 코드를 실어 보낸다. 나머지 4개는 서버 요청 자체가
+실패한 클라이언트 로컬 예외라서 서버 응답과 무관하게 클라이언트가 바로 판단해서 재생한다.
+
+## 구현 순서
+
+1. Typecast에서 위 문구를 화자/톤 하나로 통일해서 mp3로 생성 —
+   `scripts/generate_tts_assets.ps1`로 자동화함 (Typecast REST API,
+   `POST https://api.typecast.ai/v1/text-to-speech`, model `ssfm-v30` 사용).
+   **API 키 발급 후 사용자가 직접 실행해야 함** (외부 서비스 계정이라 Claude가 대신 못 함).
+2. `client/Assets/Sounds/`에 위 표의 파일명으로 저장 — 위 스크립트가 자동으로 해줌.
 3. `client/Services/Sound.cs`에 `PlayCheckIn`/`PlayCheckOut`과 같은 패턴으로
-   재생 함수 추가.
+   재생 함수 6개(`PlaySpoofSuspected`/`PlayNoMatch`/`PlayConnectionError`/
+   `PlaySendFailure`/`PlaySaveFailure`/`PlayCommFailure`) 추가함 — **완료.**
 4. 각 화면의 실패 처리 지점(위 표의 위치)에서 해당 재생 함수 호출 한 줄 추가.
-   기존 텍스트/팝업 로직은 그대로 두고 오디오만 얹는다.
+   기존 텍스트/팝업 로직은 그대로 두고 오디오만 얹음 — **완료** (5개 파일: `LoginWindow`,
+   `AdminPasswordWindow`, `FaceRegisterWindow`, `StudentEditWindow`, `AttendanceCheckView`).
 5. 키오스크(`AttendanceCheckView`)에도 동일하게 오디오만 추가 — 모달 팝업과 달리
-   화면 흐름을 막지 않으므로 추가 가능.
+   화면 흐름을 막지 않으므로 추가 가능 — **완료.**
 
-## 미결정 사항 (착수 시 다시 확인 필요)
+## 남은 일
 
-- 목소리(화자)와 톤 선택
-- 문구를 원문 그대로 쓸지, 축약할지
+- Typecast 계정/API 키 발급 (사용자 직접 — 외부 서비스 가입이라 Claude가 대신 할 수 없음.
+  https://studio.typecast.ai/developers/api).
+- 목소리(화자) 선택 — https://studio.typecast.ai 보이스 라이브러리에서 `voice_id`
+  확인 (`tc_`로 시작하는 문자열).
+- 위 두 가지가 준비되면 프로젝트 루트에서 실행:
+  ```
+  $env:TYPECAST_API_KEY = "발급받은 키"
+  .\scripts\generate_tts_assets.ps1 -VoiceId "tc_xxxxxxxxxxxxxxxxxxxxxxxx"
+  ```
+  `client/Assets/Sounds/`에 mp3 6개가 자동 생성됨. 파일만 생기면 코드 수정 없이 바로
+  재생됨 (`Sound.Play()`가 파일 없으면 조용히 무시하도록 이미 방어되어 있어서, 지금
+  상태로 빌드/실행해도 기존 동작은 그대로임).
 - 성공 상황(입실/퇴실)에도 이름을 불러주는 음성을 추가할지 — 이건 매번 다른 텍스트라
   실시간 API가 필요해지는 케이스이므로 별도 계획으로 다룬다.
