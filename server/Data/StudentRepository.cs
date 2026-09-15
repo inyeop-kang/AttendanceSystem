@@ -114,6 +114,9 @@ namespace AttendanceServer.Data
             return null;
         }
 
+        // 새 교육생을 저장하고 id를 반환한다. 학번(student_no)이 이미 쓰이고 있으면
+        // UNIQUE 제약에 걸리므로 0을 반환한다. 조회로 확인한 뒤 INSERT 하면
+        // 그 사이에 들어온 동시 요청을 막지 못하기 때문에 DB 제약을 그대로 이용한다.
         public int Insert(StudentCreateRequest request)
         {
             using (MySqlConnection connection = db.OpenConnection())
@@ -127,11 +130,25 @@ namespace AttendanceServer.Data
                 command.Parameters.AddWithValue("@department", request.Department);
                 command.Parameters.AddWithValue("@grade", request.Grade);
 
-                object result = command.ExecuteScalar();
-                return (int)Convert.ToInt64(result);
+                try
+                {
+                    object result = command.ExecuteScalar();
+                    return (int)Convert.ToInt64(result);
+                }
+                catch (MySqlException e)
+                {
+                    if (e.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+                    {
+                        return 0;
+                    }
+
+                    throw;
+                }
             }
         }
 
+        // 교육생 정보를 수정한다. 바꾸려는 학번을 다른 교육생이 이미 쓰고 있으면
+        // UNIQUE 제약에 걸리므로 false를 반환한다.
         public bool Update(int id, StudentUpdateRequest request)
         {
             using (MySqlConnection connection = db.OpenConnection())
@@ -145,8 +162,20 @@ namespace AttendanceServer.Data
                 command.Parameters.AddWithValue("@grade", request.Grade);
                 command.Parameters.AddWithValue("@id", id);
 
-                int affected = command.ExecuteNonQuery();
-                return affected > 0;
+                try
+                {
+                    command.ExecuteNonQuery();
+                    return true;
+                }
+                catch (MySqlException e)
+                {
+                    if (e.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+                    {
+                        return false;
+                    }
+
+                    throw;
+                }
             }
         }
 
@@ -160,17 +189,6 @@ namespace AttendanceServer.Data
 
                 int affected = command.ExecuteNonQuery();
                 return affected > 0;
-            }
-        }
-
-        public void MarkFaceRegistered(int id)
-        {
-            using (MySqlConnection connection = db.OpenConnection())
-            {
-                string sql = "UPDATE students SET has_face_registered = TRUE WHERE id = @id";
-                MySqlCommand command = new MySqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@id", id);
-                command.ExecuteNonQuery();
             }
         }
     }

@@ -230,6 +230,14 @@ namespace AttendanceServer
             }
 
             int newId = studentRepository.Insert(request);
+
+            // 위 조회와 INSERT 사이에 다른 요청이 같은 학번을 먼저 등록한 경우.
+            if (newId == 0)
+            {
+                result.Error = "이미 등록된 교육생 번호입니다.";
+                return result;
+            }
+
             result.Student = studentRepository.GetById(newId);
             return result;
         }
@@ -251,7 +259,13 @@ namespace AttendanceServer
             request.Department = GetString(root, "department");
             request.Grade = GetInt(root, "grade");
 
-            studentRepository.Update(id, request);
+            bool updated = studentRepository.Update(id, request);
+
+            if (!updated)
+            {
+                return new SimpleResult(false, "이미 등록된 교육생 번호입니다.");
+            }
+
             return new SimpleResult(true, "");
         }
 
@@ -305,15 +319,16 @@ namespace AttendanceServer
                 return response;
             }
 
-            faceEmbeddingRepository.DeleteByStudentId(studentId);
+            List<string> embeddingJsonList = new List<string>();
 
             foreach (List<double> embedding in result.Embeddings)
             {
-                string embeddingJson = JsonSerializer.Serialize(embedding);
-                faceEmbeddingRepository.Insert(studentId, embeddingJson, result.ModelName);
+                embeddingJsonList.Add(JsonSerializer.Serialize(embedding));
             }
 
-            studentRepository.MarkFaceRegistered(studentId);
+            // 기존 임베딩 삭제 → 새 임베딩 저장 → 얼굴 등록 표시를 한 트랜잭션으로 처리한다.
+            // 중간에 실패하면 모두 롤백되므로 등록 상태가 반쯤 깨진 채로 남지 않는다.
+            faceEmbeddingRepository.ReplaceForStudent(studentId, embeddingJsonList, result.ModelName);
 
             response.Success = true;
             response.Message = "얼굴 등록이 완료되었습니다.";
@@ -376,21 +391,34 @@ namespace AttendanceServer
             DateTime now = DateTime.Now;
             AttendanceRecord existing = attendanceRepository.GetByStudentAndDate(student.Id, now);
 
-            if (existing != null)
+            if (existing == null)
             {
-                response.Status = existing.CheckOutTime == DateTime.MinValue ? "checked_in" : "checked_out";
-                response.CheckInTime = existing.CheckInTime;
-                response.CheckOutTime = existing.CheckOutTime;
-                response.Message = student.Name + "님은 오늘 이미 입실 처리되었습니다.";
-                return response;
+                // 조회 결과가 없으면 바로 INSERT를 시도한다. 조회와 INSERT 사이에 같은 학생의
+                // 입실 요청이 먼저 처리됐다면 uniq_student_date 제약에 걸려 false가 돌아온다.
+                bool created = attendanceRepository.TryCreateCheckIn(student.Id, now, "present", response.Confidence);
+
+                if (created)
+                {
+                    response.Status = "checked_in";
+                    response.CheckInTime = now;
+                    response.Message = student.Name + "님, 입실 처리되었습니다.";
+                    return response;
+                }
+
+                // 먼저 저장된 기록을 다시 읽어서 그 내용을 안내한다.
+                existing = attendanceRepository.GetByStudentAndDate(student.Id, now);
+
+                if (existing == null)
+                {
+                    response.Message = "입실 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+                    return response;
+                }
             }
 
-            attendanceRepository.CreateCheckIn(student.Id, now, "present", response.Confidence);
-
-            response.Status = "checked_in";
-            response.CheckInTime = now;
-            response.Message = student.Name + "님, 입실 처리되었습니다.";
-
+            response.Status = existing.CheckOutTime == DateTime.MinValue ? "checked_in" : "checked_out";
+            response.CheckInTime = existing.CheckInTime;
+            response.CheckOutTime = existing.CheckOutTime;
+            response.Message = student.Name + "님은 오늘 이미 입실 처리되었습니다.";
             return response;
         }
 
@@ -416,19 +444,35 @@ namespace AttendanceServer
 
             response.CheckInTime = existing.CheckInTime;
 
-            if (existing.CheckOutTime != DateTime.MinValue)
+            if (existing.CheckOutTime == DateTime.MinValue)
             {
-                response.Status = "checked_out";
-                response.CheckOutTime = existing.CheckOutTime;
-                response.Message = student.Name + "님은 오늘 이미 퇴실 처리되었습니다.";
-                return response;
+                // UPDATE 자체에 "아직 퇴실하지 않은 경우에만" 조건이 있어서, 퇴실 요청이
+                // 동시에 두 번 들어와도 먼저 저장된 퇴실 시각을 덮어쓰지 않는다.
+                bool updated = attendanceRepository.SetCheckOut(student.Id, now, now);
+
+                if (updated)
+                {
+                    response.Status = "checked_out";
+                    response.CheckOutTime = now;
+                    response.Message = student.Name + "님, 퇴실 처리되었습니다.";
+                    return response;
+                }
+
+                // 먼저 처리된 퇴실 기록을 다시 읽어서 그 시각을 안내한다.
+                existing = attendanceRepository.GetByStudentAndDate(student.Id, now);
+
+                if (existing == null)
+                {
+                    response.Message = "퇴실 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+                    return response;
+                }
+
+                response.CheckInTime = existing.CheckInTime;
             }
 
-            attendanceRepository.SetCheckOut(student.Id, now, now);
-
             response.Status = "checked_out";
-            response.CheckOutTime = now;
-            response.Message = student.Name + "님, 퇴실 처리되었습니다.";
+            response.CheckOutTime = existing.CheckOutTime;
+            response.Message = student.Name + "님은 오늘 이미 퇴실 처리되었습니다.";
             return response;
         }
 

@@ -56,7 +56,10 @@ namespace AttendanceServer.Data
             return null;
         }
 
-        public void CreateCheckIn(int studentId, DateTime checkInTime, string status, double confidence)
+        // 입실 기록을 새로 만든다. 같은 학생·같은 날짜 기록이 이미 있으면
+        // uniq_student_date 제약에 걸리므로 false를 반환한다.
+        // (조회해서 확인한 뒤 INSERT 하면 그 사이에 들어온 동시 요청을 막지 못한다.)
+        public bool TryCreateCheckIn(int studentId, DateTime checkInTime, string status, double confidence)
         {
             using (MySqlConnection connection = db.OpenConnection())
             {
@@ -68,16 +71,34 @@ namespace AttendanceServer.Data
                 command.Parameters.AddWithValue("@checkInTime", checkInTime);
                 command.Parameters.AddWithValue("@status", status);
                 command.Parameters.AddWithValue("@confidence", confidence);
-                command.ExecuteNonQuery();
+
+                try
+                {
+                    command.ExecuteNonQuery();
+                    return true;
+                }
+                catch (MySqlException e)
+                {
+                    if (e.ErrorCode == MySqlErrorCode.DuplicateKeyEntry)
+                    {
+                        return false;
+                    }
+
+                    throw;
+                }
             }
         }
 
+        // 아직 퇴실하지 않은 기록에만 퇴실 시각을 쓴다. 조건을 UPDATE 자체에 두었기 때문에
+        // 퇴실 요청이 동시에 두 번 들어와도 먼저 저장된 퇴실 시각을 덮어쓰지 않는다.
+        // 반환값 false = 이미 퇴실했거나 해당 날짜 기록이 없음.
         public bool SetCheckOut(int studentId, DateTime date, DateTime checkOutTime)
         {
             using (MySqlConnection connection = db.OpenConnection())
             {
                 string sql = "UPDATE attendance SET check_out_time = @checkOutTime " +
-                             "WHERE student_id = @studentId AND attendance_date = @date";
+                             "WHERE student_id = @studentId AND attendance_date = @date " +
+                             "AND check_out_time IS NULL";
                 MySqlCommand command = new MySqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@checkOutTime", checkOutTime);
                 command.Parameters.AddWithValue("@studentId", studentId);
